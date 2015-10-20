@@ -22,6 +22,11 @@ class LayoutView {
         echo $r->getRegLink();
       if ($isLoggedIn) {
         echo "<h2>Logged in</h2>";
+        if($ev->clickedNewEntry())
+          echo $ev->getStartLink();
+        else {
+          echo $ev->getEntryLink();
+        }
       } else {
         echo "<h2>Not logged in</h2>";
     }
@@ -30,8 +35,9 @@ class LayoutView {
       <?php
       if($r->clickedRegister() && $r->regSuccess() === false)
         echo $r->response();
-      elseif($v->clickedNewEntry())
+      if($ev->clickedNewEntry() && $ev->saveSuccess() === false) {
         echo $ev->response();
+      }
       else
         echo $v->response();
 

@@ -12,55 +12,37 @@ class LoginController {
 
 	private $model;
     private $entryModel;
-	private $view;
-	private $regView;
+	private $loginView;
     private $editView;
     private $user;
+	private $entryController;
 
-	public function __construct(LoginModel $model, LoginView $view, RegistrationView $regView, EditView $editView, EntryModel $entryModel ) {
+	public function __construct(LoginModel $model, LoginView $loginView, EditView $editView, EntryModel $entryModel, EntryController $entryController ) {
 		$this->model = $model;
         $this->entryModel = $entryModel;
-		$this->view =  $view;
-		$this->regView = $regView;
+		$this->loginView =  $loginView;
         $this->editView = $editView;
+		$this->entryController = $entryController;
 	}
 
-	public function doControl() {
+	public function doLoginControl() {
 		
-		$userClient = $this->view->getUserClient();
-
+		$userClient = $this->loginView->getUserClient();
 		if ($this->model->isLoggedIn($userClient)) {
-            $this->user = $this->view->getUserName();
-			if($this->view->clickedNewEntry()) {
-                $entry = $this->editView->getEntry($this->user);
-                if ($this->editView->userWantsToSave()) {
-                    $this->editView->setSaveSuccess();
-                    $this->entryModel->saveEntry($entry);
-                }
-            }
-			if ($this->view->userWantsToLogout()) {
+			if ($this->loginView->userWantsToLogout()) {
 				$this->model->doLogout();
-				$this->view->setUserLogout();
-                $this->user = "";
+				$this->loginView->setUserLogout();
+				$this->user = "";
 			}
-		} else {
-			if ($this->view->userWantsToLogin()) {
-				$uc = $this->view->getCredentials();
+		}
+		else {
+			if ($this->loginView->userWantsToLogin()) {
+				$uc = $this->loginView->getCredentials();
 				if ($this->model->doLogin($uc) == true) {
-					$this->view->setLoginSucceeded();
+					$this->loginView->setLoginSucceeded();
 				} else {
-					$this->view->setLoginFailed();
+					$this->loginView->setLoginFailed();
 				}
-			}
-
-			else if ($this->regView->userWantsToRegister() && $this->regView->checkForm()) {
-                $user = $this->regView->getUser();
-                if ($user->registerUser() == true) {
-					$this->regView->setRegSuccess();
-                    $this->view->setUserRegistration();
-                }
-				else
-					$this->regView->setRegFail();
 			}
 		}
 		$this->model->renew($userClient);

@@ -15,19 +15,18 @@ class EditView {
     private static $cancel = "EditView::Cancel";
     private static $save = "EditView::Save";
 
-    private $idValue;
+    private static $entryLink = "entry";
 
-    private $user;
+    private $idValue = 1;
 
-    private $saveSuccess;
+    private $saveSuccess = false;
 
     private static $sessionSaveLocation;
     private static $userSaveLocation;
 
     public function __construct() {
-        self::$sessionSaveLocation = Settings::MESSAGE_SESSION_NAME . Settings::APP_SESSION_NAME;
-        self::$userSaveLocation = Settings::USER_SESSION_NAME . Settings::APP_SESSION_NAME;
-        $this->user = Settings::USER_SESSION_NAME;
+       // self::$sessionSaveLocation = Settings::MESSAGE_SESSION_NAME . Settings::APP_SESSION_NAME;
+       // self::$userSaveLocation = Settings::USER_SESSION_NAME . Settings::APP_SESSION_NAME;
     }
 
     public function response() {
@@ -36,15 +35,13 @@ class EditView {
 
     private function doEditForm() {
         $message = "";
-        if($this->userWantsToSave()) {
-            if($this->getTitle() == "")
-                $message = "Title cant be empty";
-            if($this->getText() == "")
-                $message = "Entry content cant be empty";
+        if ($this->userWantsToSave()) {
+            if (strlen($this->getTitle()) > 0)
+                $message .= "Title cant be empty";
+            if (strlen($this->getText()) > 0)
+                $message .= "Entry content cant be empty";
         }
-
         return $this->generateEditForm($message);
-
     }
 
     private function generateEditForm($message) {
@@ -52,35 +49,42 @@ class EditView {
                 <form action="?edit" method="post" enctype="multipart/form-data">
                     <fieldset>
                     <legend>Write a new blog entry</legend>
-                        <p id="'.self::$message.'">'.$message.'</p>
-                        <label for="'.self::$title.'">Title :</label>
-                        <input type="text" size="20" name="'.self::$title.'" id="' .self::$title. '" value="">
-                        <label for="'.self::$ID.'">ID: '.$this->idValue. '</label>
+                        <p id="'.self::$message.'">' .$message. '</p>
+                        <label for="' .self::$title. '">Title :</label>
+                        <input type="text" size="20" name="' .self::$title. '" id="' .self::$title. '" value="">
+                        <label for="' .self::$ID. '">ID: ' .$this->idValue. '</label>
                         <tr><td> <input type="hidden" name="type" value="<?php echo $this->idValue; ?>" ></td></tr>
                         <br>
                         <textarea name="text" cols="100" rows="20" placeholder="Write something..."></textarea>
                         <br>
-                        <input id="submit" type="submit" name="'.self::$save.'" value="Save">
-                        <input id="submit" type="submit" name="'.self::$cancel.'" value="Cancel">
+                        <input id="submit" type="submit" name="' .self::$save. '" value="Save">
                         <br>
                     </fieldset>
                 </form>';
     }
 
+    public function getEntryLink() {
+        return '<a href="?'.self::$entryLink.'">Write a new entry</a>';
+    }
+
+    public function getStartLink() {
+        return '<a href="?">Back to start</a>';
+    }
+
+    public function saveSuccess() {
+        return $this->saveSuccess;
+    }
+
+    public function checkForm() {
+        return strlen($this->getTitle()) > 0 && strlen($this->getText()) > 0;
+    }
+
     public function setSaveSuccess() {
-        $_SESSION[self::$sessionSaveLocation] = "Saved new entry.";
         $this->saveSuccess = true;
-        $actual_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
-        header("Location: $actual_link");
-        exit;
     }
 
     public function getEntry($user) {
         return new Entry($user, $this->getTitle(), $this->getText());
-    }
-
-    public function userWantsToCancel() {
-        return isset($_POST[self::$cancel]);
     }
 
     public function userWantsToSave() {
@@ -107,6 +111,10 @@ class EditView {
 
     public function increaseID() {
         $this->idValue++;
+    }
+
+    public function clickedNewEntry() {
+        return isset($_GET[self::$entryLink]);
     }
 
 }

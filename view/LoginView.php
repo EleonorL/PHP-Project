@@ -16,7 +16,6 @@ class LoginView {
 	private static $CookiePassword = "LoginView::CookiePassword";
 	private static $keep = "LoginView::KeepMeLoggedIn";
 	private static $messageId = "LoginView::Message";
-	private static $newEntry = "LoginView::Entry";
 
 	/**
 	 * This name is used in session
@@ -238,8 +237,8 @@ class LoginView {
 		return "<form  method='post' >
 			<p id='" . self::$messageId . "'>$message</p>
 			<input type='submit' name='" . self::$logout . "' value='Logout'/>
-			<input type='submit' name='" . self::$newEntry . "' value='New Entry'/>
-			</form>";
+			</form>
+           ";
 	}
 
 	private function generateLoginFormHTML($message) {
@@ -293,8 +292,4 @@ class LoginView {
 		return isset($_POST[self::$keep]) || 
 			   isset($_COOKIE[self::$CookiePassword]);
 	}
-
-	public function clickedNewEntry() {
-		return isset($_POST[self::$newEntry]);
-    }
 }

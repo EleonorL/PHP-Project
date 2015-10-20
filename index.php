@@ -5,6 +5,9 @@
   */
 require_once("Settings.php");
 require_once("controller/LoginController.php");
+require_once("controller/RegisterController.php");
+require_once("controller/EntryController.php");
+require_once("controller/ApplicationController.php");
 require_once("view/DateTimeView.php");
 require_once("view/LayoutView.php");
 require_once("view/RegistrationView.php");
@@ -22,17 +25,20 @@ session_start();
 $m = new LoginModel();
 $em = new EntryModel();
 $v = new LoginView($m);
-$r = new RegistrationView();
+$rv = new RegistrationView();
 $ev = new EditView();
-$c = new LoginController($m, $v, $r, $ev, $em);
+$rc = new RegisterController($rv, $v);
+$ec = new EntryController($ev, $em);
+$lc = new LoginController($m, $v, $ev, $em, $ec);
+$ac = new ApplicationController($lc, $rc, $ec);
 
 
 //Controller must be run first since state is changed
-$c->doControl();
+$ac->doControl();
 
 
 //Generate output
 $dtv = new DateTimeView();
 $lv = new LayoutView();
-$lv->render($m->isLoggedIn($v->getUserClient()), $v, $dtv, $r, $ev);
+$lv->render($m->isLoggedIn($v->getUserClient()), $v, $dtv, $rv, $ev);
 

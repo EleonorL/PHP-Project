@@ -38,13 +38,18 @@ class LoginView {
 	 */
 	private $model;
 
+	private $entries;
+
+	private $loggedName;
+
 	/**
 	 * @param LoginModel $model
 	 */
-	public function __construct(LoginModel $model) {
+	public function __construct(LoginModel $model, Entries $entries) {
 		self::$sessionSaveLocation = Settings::MESSAGE_SESSION_NAME . Settings::APP_SESSION_NAME;
 		self::$userSaveLocation = Settings::USER_SESSION_NAME . Settings::APP_SESSION_NAME;
 		$this->model = $model;
+		$this->entries = $entries;
 	}
 
 	/**
@@ -97,7 +102,7 @@ class LoginView {
 	 * call this if login succeeds
 	 */
 	public function setLoginSucceeded() {
-		$this->loginHasSucceeded = true;	
+		$this->loginHasSucceeded = true;
 	}
 
 	/**
@@ -134,6 +139,7 @@ class LoginView {
 	 */
 	private function doLogoutForm() {
 		$message = "";
+        $entryMessage = "";
 		//Correct Login Message
 		if ($this->loginHasSucceeded === true) {
 			$message = "Welcome";
@@ -148,7 +154,7 @@ class LoginView {
 		} else {
 			$message = $this->getSessionMessage();
 			$this->getSessionUser();
-			
+			$entryMessage = $this->loadEntries();
 		}
 
 		//Set new cookies
@@ -159,7 +165,7 @@ class LoginView {
 		}
 
 		//generate HTML
-		return $this->getLogoutButtonHTML($message);
+		return $this->getLogoutButtonHTML($message, $entryMessage);
 	}
 
 	/**
@@ -232,8 +238,8 @@ class LoginView {
 			setcookie(self::$CookiePassword, $tempCred->getPassword(), $tempCred->getExpire());
 		}
 	}
-    //TODO: Display 5 most recent entries and link to directory page.
-	private function getLogoutButtonHTML($message) {
+
+	private function getLogoutButtonHTML($message, $entryMessage) {
 		return "<form  method='post' >
 			<p id='" . self::$messageId . "'>$message</p>
 			<input type='submit' name='" . self::$logout . "' value='Logout'/>
@@ -268,8 +274,9 @@ class LoginView {
 	}
 
 	public function getUserName() {
-		if (isset($_POST[self::$name]))
+		if (isset($_POST[self::$name])) {
 			return trim($_POST[self::$name]);
+		}
 
 		if (isset($_COOKIE[self::$cookieName]))
 			return trim($_COOKIE[self::$cookieName]);
@@ -292,4 +299,48 @@ class LoginView {
 		return isset($_POST[self::$keep]) || 
 			   isset($_COOKIE[self::$CookiePassword]);
 	}
+
+	public function getLoggedName() {
+		$this->loggedName = $_SESSION['username'];
+		return $this->loggedName;
+	}
+
+	public function setSessionName($name) {
+		$_SESSION['username'] = $name;
+	}
+
+	public function loadEntries() {
+        $ID = "";
+		$name = $_SESSION['username'];
+		if(file_exists(Settings::ENTRYPATH . addslashes($name) . "/index"))
+			$ID = file_get_contents(Settings::ENTRYPATH . addslashes($name) . "/index") - 1;
+        if($ID == 0)
+            $text = "No entries found";
+        else
+		    $text = nl2br("Entry nr " . $ID . ". \n \n" . $this->model->loadEntries($name, $ID));
+		return $text;
+	}
+
+	public function getMenu() {
+		$ent = $this->entries->getEntries();
+		$line = "";
+		if($ent != "") {
+			foreach ($ent as $entry) {
+				$title = explode("\r\n", $entry)[0];
+				$line .= "<li><a href='?id='><span>" . $title . "</span></a></li>";
+			}
+			return "<br>
+				<h3>List of entries</h3>
+				<div id='cssmenu'>
+				<ul>
+  					$line
+				</ul>
+				</div>";
+		}
+		else
+			return "<h3>List of entries</h3>
+					<p>No entries found</p>";
+
+	}
+
 }

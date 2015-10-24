@@ -9,9 +9,9 @@
 class EntryDAL {
 
     public function save($name, $ID, $text) {
-        if(file_exists(self::getFileName($name, $ID)))
+        if(file_exists(self::getFileName($name, $ID))) {
             return false;
-        else {
+        } else {
             file_put_contents(self::getFileName($name, $ID), $text);
             return true;
         }
@@ -19,12 +19,26 @@ class EntryDAL {
 
     public function load($name, $ID) {
         if(file_exists(self::getFileName($name, $ID)))
-            return unserialize(file_get_contents(self::getFileName($name, $ID)));
+            return file_get_contents(self::getFileName($name, $ID));
     }
 
     public function getFileName($name, $ID) {
-        $folder = Settings::ENTRYPATH . addslashes($name);
-        return $folder . addslashes($ID);
+        return Settings::ENTRYPATH . addslashes($name) . "/" .$ID;
+    }
+
+    public function getEntries() {
+        $name = $_SESSION['username'];
+        $ID = "";
+        $entries = "";
+        if(file_exists(Settings::ENTRYPATH . addslashes($name) . "/index"))
+            $ID = file_get_contents(Settings::ENTRYPATH . addslashes($name) . "/index") - 1;
+        while($ID != 0) {
+            $entry = $this->load($name, $ID);
+            $entries[] = $entry;
+            $ID = $ID - 1;
+        }
+        return $entries;
+
     }
 
 }

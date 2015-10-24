@@ -12,9 +12,10 @@ class LayoutView {
   <head>
     <meta charset="utf-8">
     <title>The Initiative for Procrastination</title>
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css"/>
   </head>
   <body>
-    <h1>The Initiative for Procrastination</h1>
+    <h1 id="headline">The Initiative for Procrastination</h1>
     <?php
       if($r->clickedRegister())
         echo $r->getLoginLink();
@@ -35,11 +36,14 @@ class LayoutView {
       <?php
       if($r->clickedRegister() && $r->regSuccess() === false)
         echo $r->response();
-      if($ev->clickedNewEntry() && $ev->saveSuccess() === false) {
+      elseif($ev->clickedNewEntry() && $ev->saveSuccess() === false && $isLoggedIn) {
         echo $ev->response();
       }
-      else
+      else {
+        if($isLoggedIn)
+          echo $v->getMenu();
         echo $v->response();
+      }
 
         $dtv->show();
       ?>

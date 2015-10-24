@@ -23,5 +23,4 @@ class RegisterController {
                 $this->regView->setRegFail();
         }
     }
-
 }

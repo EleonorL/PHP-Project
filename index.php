@@ -8,13 +8,14 @@ require_once("controller/LoginController.php");
 require_once("controller/RegisterController.php");
 require_once("controller/EntryController.php");
 require_once("controller/ApplicationController.php");
+require_once("model/Entries.php");
 require_once("view/DateTimeView.php");
 require_once("view/LayoutView.php");
 require_once("view/RegistrationView.php");
-require_once("view/EditView.php");
+require_once("view/EntryView.php");
 
 if (Settings::DISPLAY_ERRORS) {
-	error_reporting(-1);
+    error_reporting(-1);
 	ini_set('display_errors', 'ON');
 }
 
@@ -22,16 +23,16 @@ if (Settings::DISPLAY_ERRORS) {
 session_start(); 
 
 //Dependency injection
+$ed = new EntryDAL();
 $m = new LoginModel();
-$em = new EntryModel();
-$v = new LoginView($m);
+$e = new Entries($ed);
+$v = new LoginView($m, $e);
 $rv = new RegistrationView();
 $ev = new EditView();
 $rc = new RegisterController($rv, $v);
-$ec = new EntryController($ev, $em);
-$lc = new LoginController($m, $v, $ev, $em, $ec);
+$ec = new EntryController($ev, $v);
+$lc = new LoginController($m, $v, $ev, $ec);
 $ac = new ApplicationController($lc, $rc, $ec);
-
 
 //Controller must be run first since state is changed
 $ac->doControl();

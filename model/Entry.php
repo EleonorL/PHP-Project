@@ -6,16 +6,19 @@
  * Date: 2015-10-16
  * Time: 15:00
  */
+
+require_once("model/EntryDAL.php");
+
 class Entry {
 
     private $ID;
-    private $name;
     private $text;
+    private $name;
     public $dal;
 
     public function __construct($name, $text, $ID) {
-        $this->name = $name;
         $this->text = $text;
+        $this->name = $name;
         $this->ID = $ID;
         $this->dal = new EntryDAL();
     }
@@ -24,7 +27,7 @@ class Entry {
         return $this->dal->save($this->name, $this->ID, $this->text);
     }
 
-    public function getUsername() {
+    public function getName() {
         return $this->name;
     }
 

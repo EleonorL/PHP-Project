@@ -10,6 +10,7 @@ require_once("model/TempCredentialsDAL.php");
 require_once("model/LoggedInUser.php");
 require_once("model/UserClient.php");
 require_once("model/UserDAL.php");
+require_once("model/EntryDAL.php");
 
 
 
@@ -26,6 +27,7 @@ class LoginModel {
 
 	private $tempDAL;
 	private $userDAL;
+    private $entryDAL;
 
 	public function __construct() {
 		self::$sessionUserLocation .= Settings::APP_SESSION_NAME;
@@ -37,6 +39,7 @@ class LoginModel {
 		}
 		$this->tempDAL = new TempCredentialsDAL();
 		$this->userDAL = new UserDAL();
+        $this->entryDAL = new EntryDAL();
 		
 	}
 
@@ -105,5 +108,10 @@ class LoginModel {
 			$this->tempDAL->save($user, $this->tempCredentials);
 		}
 	}
+
+	public function loadEntries($name, $ID) {
+        $text = $this->entryDAL->load($name, $ID);
+        return $text;
+    }
 	
 }

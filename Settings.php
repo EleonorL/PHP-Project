@@ -17,7 +17,6 @@ class Settings {
 	const MESSAGE_SESSION_NAME = "Message::";
 	const USER_SESSION_NAME = "User::";
 
-	const TEMPNAME = "";
 	/**
 	 * Username of default user
 	 */
@@ -42,7 +41,6 @@ class Settings {
 	 * Path to folder where entries are stored
 	 */
 	const ENTRYPATH = "./Entry/";
-
 	/**
 	 * Salt for creating temporary passwords
 	 * Should be a random string like "feje3-#GS"

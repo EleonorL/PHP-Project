@@ -10,7 +10,9 @@ class UserDAL {
             return false;
         else {
             file_put_contents(self::getFileName($name), serialize($password));
-            mkdir(self::getFolderName($name), 0777);
+            $folderName = self::getFolderName($name);
+            mkdir($folderName, 0755, true);
+            file_put_contents($folderName . "/index", 1);
             return true;
         }
     }
@@ -27,5 +29,4 @@ class UserDAL {
     public function getFolderName($name) {
         return Settings::ENTRYPATH . addslashes($name);
     }
-
 }

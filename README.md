@@ -24,11 +24,11 @@ A user is registered and logged in.
 4. User press Save button.
 
 #### Alternate Scenarios
-3a. The user wants to exit the page
-i. The user press the "Back to start" link.
-4a. The entry could not be saved.
-i. System presents error message.
-ii. Step 2 in Main Scenario.
+* 3a. The user wants to exit the page
+ * i. The user press the "Back to start" link.
+* 4a. The entry could not be saved.
+ * i. System presents error message.
+ * ii. Step 2 in Main Scenario.
 
 ### Use Case 2: View existing entry
 

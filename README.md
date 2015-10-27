@@ -4,9 +4,9 @@ Author: Eleonor Lagerkrants
 
 ##Vision Document
 ##Problem that is solved
-The rising tide of social media enables for people to express and display their thoughts and feelings for world.
+The rising tide of social media enables people to express and display their thoughts and feelings for world.
 But all people have some thoughts and feelings that are private and not meant for public scrutiny, but this information
-still needs to be expressed. That is why diaries have existed and my project is an online Diary Application.
+still needs to be expressed. That is why diaries have existed and my project is an online Diary Application, The Initiative for Procrastination.
 
 The user will be able to register a new user, log in with that user and write Diary Entries, the entries will be saved
 and can be read whenever the user wants to.

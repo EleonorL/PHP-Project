@@ -101,12 +101,10 @@ class EditView {
     }
 
     public function setSaveSuccess() {
-        $_SESSION[self::$sessionSaveLocation] = "Saved new entry.";
         unset($_GET[self::$entryLink]);
         $this->saveSuccess = true;
         $actual_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
         header("Location: $actual_link");
-
     }
 
     public function setSaveFail() {

@@ -5,7 +5,7 @@
   */
 
 class LayoutView {
-  public function render($isLoggedIn, LoginView $v, DateTimeView $dtv, RegistrationView $r, EditView $ev) {
+  public function render($isLoggedIn, LoginView $v, DateTimeView $dtv, RegistrationView $r, EditView $ev, ViewEntryView $vev) {
 ?>
 <!DOCTYPE html>
 <html>
@@ -17,19 +17,22 @@ class LayoutView {
   <body>
     <h1 id="headline">The Initiative for Procrastination</h1>
     <?php
-      if($r->clickedRegister())
-        echo $r->getLoginLink();
-      elseif(!$isLoggedIn)
-        echo $r->getRegLink();
       if ($isLoggedIn) {
         echo "<h2>Logged in</h2>";
-        if($ev->clickedNewEntry())
+        if ($ev->clickedNewEntry())
           echo $ev->getStartLink();
+        elseif($v->userWantsToView())
+          echo $vev->getStartLink();
         else {
           echo $ev->getEntryLink();
         }
-      } else {
+      }
+        else {
         echo "<h2>Not logged in</h2>";
+        if($r->clickedRegister())
+          echo $r->getLoginLink();
+        elseif(!$isLoggedIn)
+          echo $r->getRegLink();
     }
   ?>
     <div class="container" >
@@ -37,12 +40,22 @@ class LayoutView {
       if($r->clickedRegister() && $r->regSuccess() === false)
         echo $r->response();
       elseif($ev->clickedNewEntry() && $ev->saveSuccess() === false && $isLoggedIn) {
-        echo $ev->response();
+          echo $ev->response();
       }
+      elseif($v->userWantsToView() && $v->clickedMenuItem() === true) {
+          echo $vev->response();
+      }
+
+
       else {
-        if($isLoggedIn)
+        if($isLoggedIn) {
+          echo $v->response();
           echo $v->getMenu();
+          echo $v->getLogoutButton();
+        }
+
         echo $v->response();
+
       }
 
         $dtv->show();

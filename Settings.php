@@ -47,6 +47,8 @@ class Settings {
 	 */
 	const SALT = "feje3-#GS";
 
+	const VIEW = "view";
+
 	/**
 	 * Show errors 
 	 * boolean true | false

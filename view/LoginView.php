@@ -32,15 +32,24 @@ class LoginView {
 	private $loginHasSucceeded = false;
 	private $userDidLogout = false;
 	private $userDidRegister = false;
+    private $clickedItem = false;
 
 	/**
 	 * @var LoginModel
 	 */
 	private $model;
 
+    /**
+     * @var Array of entries
+     */
 	private $entries;
 
+    /**
+     * Variable for the user that is logged in
+     */
 	private $loggedName;
+
+
 
 	/**
 	 * @param LoginModel $model
@@ -49,7 +58,7 @@ class LoginView {
 		self::$sessionSaveLocation = Settings::MESSAGE_SESSION_NAME . Settings::APP_SESSION_NAME;
 		self::$userSaveLocation = Settings::USER_SESSION_NAME . Settings::APP_SESSION_NAME;
 		$this->model = $model;
-		$this->entries = $entries;
+		$this->entries = $entries->getEntries();
 	}
 
 	/**
@@ -114,9 +123,25 @@ class LoginView {
 		$this->userDidLogout = true;
 	}
 
+    /**
+     * Call this when registration was successful
+     */
+
 	public function setUserRegistration() {
 		$this->userDidRegister = true;
 	}
+
+    /**
+     * Call this when a menu item was selected
+     */
+
+    public function setClickedItem() {
+        $this->clickedItem = true;
+    }
+
+    public function clickedMenuItem() {
+        return $this->clickedItem;
+    }
 
 	/**
 	 * Create HTTP response
@@ -133,13 +158,16 @@ class LoginView {
 		}
 	}
 
+    public function getLogoutButton() {
+        return $this->getLogoutButtonHTML();
+    }
+
 	/**
 	 * @sideeffect Sets cookies!
 	 * @return [String HTML
 	 */
 	private function doLogoutForm() {
 		$message = "";
-        $entryMessage = "";
 		//Correct Login Message
 		if ($this->loginHasSucceeded === true) {
 			$message = "Welcome";
@@ -154,7 +182,6 @@ class LoginView {
 		} else {
 			$message = $this->getSessionMessage();
 			$this->getSessionUser();
-			$entryMessage = $this->loadEntries();
 		}
 
 		//Set new cookies
@@ -165,7 +192,7 @@ class LoginView {
 		}
 
 		//generate HTML
-		return $this->getLogoutButtonHTML($message, $entryMessage);
+		return $this->getMessageHTML($message);
 	}
 
 	/**
@@ -239,32 +266,61 @@ class LoginView {
 		}
 	}
 
-	private function getLogoutButtonHTML($message, $entryMessage) {
-		return "<form  method='post' >
-			<p id='" . self::$messageId . "'>$message</p>
+    /**
+     * Returns HTML code that displays message
+     */
+
+    private  function getMessageHTML($message) {
+        return "<div class='form-style-2'>
+            <form  method='post' >
+			<div class='form-style-2-text'>$message</div>
+			</form>
+			</div>
+		";
+    }
+
+    /**
+     * Returns HTML code that displays logout button
+     */
+
+	private function getLogoutButtonHTML() {
+        return "<div class='form-style-2'>
+            <form  method='post' >
 			<input type='submit' name='" . self::$logout . "' value='Logout'/>
 			</form>
-           ";
+			</div>
+        ";
 	}
 
+    /**
+     * HTML code that displays login form
+     */
+
 	private function generateLoginFormHTML($message) {
-		return "<form method='post' > 
-				<fieldset>
-					<legend>Login - enter Username and password</legend>
-					<p id='".self::$messageId."'>$message</p>
-					<label for='".self::$name."'>Username :</label>
-					<input type='text' id='".self::$name."' name='".self::$name."' value='".$this->getRequestUserName()."'/>
-
-					<label for='".self::$password."'>Password :</label>
-					<input type='password' id='".self::$password."' name='".self::$password."'/>
-
-					<label for='".self::$keep."'>Keep me logged in  :</label>
-					<input type='checkbox' id='".self::$keep."' name='".self::$keep."'/>
-					
-					<input type='submit' name='".self::$login."' value='login'/>
-				</fieldset>
+        return "<div class='form-style-2'>
+			    <div class='form-style-2-heading'>Login - Enter Username and Password</div>
+                <form method='post' >
+					<div class='form-style-2-message'>$message</div>
+					<input type='text' class='input-field' placeholder='Username' id='".self::$name."' name='".self::$name."' value='".$this->getRequestUserName()."'/>
+					<input type='password' class='input-field' placeholder='Password' id='".self::$password."' name='".self::$password."'/>
+                    <div>
+					<label for='".self::$keep."'>
+					<input type='checkbox' id='".self::$keep."' name='".self::$keep."'> Keep me logged in
+					</label>
+                    </div>
+					<input type='submit' name='".self::$login."' value='Login'/>
 			</form>
+			</div>
+			</div>
 		";
+	}
+
+    /**
+     * Check if login form is valid
+     */
+
+	public function checkForm() {
+		return strlen($this->getUserName()) > 0 && strlen($this->getPassword()) > 0;
 	}
 
 	private function getRequestUserName() {
@@ -301,7 +357,9 @@ class LoginView {
 	}
 
 	public function getLoggedName() {
-		$this->loggedName = $_SESSION['username'];
+		$this->loggedName = "";
+		if(isset($_SESSION['username']))
+			$this->loggedName = $_SESSION['username'];
 		return $this->loggedName;
 	}
 
@@ -309,28 +367,21 @@ class LoginView {
 		$_SESSION['username'] = $name;
 	}
 
-	public function loadEntries() {
-        $ID = "";
-		$name = $_SESSION['username'];
-		if(file_exists(Settings::ENTRYPATH . addslashes($name) . "/index"))
-			$ID = file_get_contents(Settings::ENTRYPATH . addslashes($name) . "/index") - 1;
-        if($ID == 0)
-            $text = "No entries found";
-        else
-		    $text = nl2br("Entry nr " . $ID . ". \n \n" . $this->model->loadEntries($name, $ID));
-		return $text;
-	}
+    /**
+     * Creates and returns HTML code that displays a list of the users entries
+     */
 
 	public function getMenu() {
-		$ent = $this->entries->getEntries();
 		$line = "";
-		if($ent != "") {
-			foreach ($ent as $entry) {
-				$title = explode("\r\n", $entry)[0];
-				$line .= "<li><a href='?id='><span>" . $title . "</span></a></li>";
+		if($this->entries != "") {
+			foreach ($this->entries as $entry)  {
+                $text = $entry->getText();
+				$entryText = explode("\r\n", $text);
+				$title = $entryText[0];
+				$line .= "<li><a href='?".Settings::VIEW."=".$entry->getID()."'><span>" . $title . "</span></a></li>";
 			}
 			return "<br>
-				<h3>List of entries</h3>
+				<div class='form-style-2-heading'>List of entries</div>
 				<div id='cssmenu'>
 				<ul>
   					$line
@@ -338,9 +389,27 @@ class LoginView {
 				</div>";
 		}
 		else
-			return "<h3>List of entries</h3>
+			return "<div class='form-style-2-heading'>List of entries</div>
 					<p>No entries found</p>";
-
 	}
+
+    public function userWantsToView() {
+        return isset($_GET[Settings::VIEW]);
+    }
+
+    /**
+     * Compares the selected menu item with entry ID to determine what entry should be displayed
+     */
+    public function getMenuURL() {
+        if(isset($_GET[Settings::VIEW])) {
+            $url = $_GET[Settings::VIEW];
+            foreach ($this->entries as $entry) {
+                if (strcmp($entry->getID(), $url) === 0) {
+                    return $entry;
+                }
+            }
+        }
+    }
+
 
 }

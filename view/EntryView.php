@@ -13,14 +13,18 @@ class EditView {
 
     private static $text = "EntryView::Text";
     private static $title = "EntryView::Title";
-    private static $message = "EntryView::Message";
-    private static $ID = "EntryView::ID";
     private static $save = "EntryView::Save";
 
     private static $entryLink = "entry";
 
+    /**
+     * Displays the current user entry ID
+     */
     private $idValue;
 
+    /**
+     * Variables that are controlled through setters
+     */
     private $saveSuccess = false;
     private $saveFail = false;
 
@@ -33,18 +37,17 @@ class EditView {
     }
 
     private function generateEditForm($message) {
-        return "<h2>New Blog Entry</h2>
+        return "<div class='form-style-2'>
+                <div class='form-style-2-heading'>New Entry</div>
                 <form action='?entry' method='post' enctype='multipart/form-data'>
-                    <fieldset>
-                    <legend>Write a new blog entry</legend>
-                        <p id='".self::$message."'>" .$message. "</p>
-                        <label for='".self::$title."'>Title :</label>
-					    <input type='' id='".self::$title."' name='".self::$title."'/>
-                        <label for='" .self::$ID. "'>Entry nr: " .$this->idValue. "</label>
+                    <div class='form-style-2-text'>Write a new entry</div>
+                        <div class='form-style-2-message'>" .$message. "</div>
+					    <input type='text' class='input-field' placeholder='Title' id='". self::$title ."' name='". self::$title ."'/>
+                        <div class='form-style-2-text'>Entry nr: " .$this->idValue. "</div>
                         <br>
-                        <textarea name='". self::$text ."' id='". self::$text ."' cols='100' rows='20' placeholder='Write something...'></textarea>
+                        <textarea name='". self::$text ."' class='textarea-field' id='". self::$text ."' placeholder='Write something...'></textarea>
                         <br>
-                        <input id='submit' type='submit' name='" .self::$save. "' value='Save'>
+                        <input id='submit' type='submit' name='". self::$save ."' value='Save'>
                         <br>
                     </fieldset>
                 </form>";
@@ -57,8 +60,15 @@ class EditView {
     private function doEditForm() {
         $message = "";
         if ($this->userWantsToSave()) {
-            if (strlen($this->getText()) < 1)
+            if(strlen($this->getTitle()) < 3) {
+                $message .= "Title should be more than 3 characters. ";
+            }
+            if(strlen($this->getTitle()) > 20) {
+                $message .= "Title should be less than 20 characters. ";
+            }
+            if(strlen($this->getText()) < 1) {
                 $message .= "Entry content cannot be empty. ";
+            }
         }
         return $this->generateEditForm($message);
     }
@@ -71,6 +81,9 @@ class EditView {
         return '<a href="?">Back to start</a>';
     }
 
+    /**
+     * Reads user index file and sets idValue
+     */
     public function setID($name) {
         if(file_exists(Settings::ENTRYPATH . addslashes($name) . "/index"))
             $this->idValue = file_get_contents(Settings::ENTRYPATH . addslashes($name) . "/index");
@@ -80,14 +93,19 @@ class EditView {
         return $this->saveSuccess;
     }
 
+    /**
+     * Checks if the entry form is valid
+     */
     public function checkForm() {
-        return strlen($this->getText()) > 0;
+        return strlen($this->getTitle()) > 2 && strlen($this->getTitle()) < 21 && strlen($this->getText()) > 0;
     }
 
     public function setSaveSuccess() {
         $_SESSION[self::$sessionSaveLocation] = "Saved new entry.";
         unset($_GET[self::$entryLink]);
         $this->saveSuccess = true;
+        $actual_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
+        header("Location: $actual_link");
 
     }
 

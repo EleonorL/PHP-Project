@@ -16,6 +16,4 @@ class Entries {
         return $this->entries;
     }
 
-
-
 }

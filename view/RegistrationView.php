@@ -24,24 +24,21 @@ class RegistrationView {
     }
 
     private function generateRegistrationForm($message){
-        return '<h2>Register new user</h2>
+        return '<div class="form-style-2">
+                <div class="form-style-2-heading">Register new user</div>
                 <form action="?register" method="post" enctype="multipart/form-data">
-                    <fieldset>
-                    <legend>Register a new user - Write username and password</legend>
-                        <p id="'.self::$message.'">'.$message.'</p>
-                        <label for="'.self::$name.'">Username :</label>
-                        <input type="text" size="20" name="'.self::$name.'" id="'.self::$name.'" value="'.$this->getUsername().'">
+                    <div class="form-style-2-text">Register a new user - Write username and password</div>
+                        <div class="form-style-2-message">'.$message.'</div>
+                        <input type="text" class="input-field" placeholder="Username" size="20" name="'.self::$name.'" id="'.self::$name.'" value="'.$this->getUsername().'">
                         <br>
-                        <label for="'.self::$password.'">Password  :</label>
-                        <input type="password" size="20" name="'.self::$password.'" id="'.self::$password.'" value="">
+                        <input type="password" class="input-field" placeholder="Password" size="20" name="'.self::$password.'" id="'.self::$password.'" value="">
                         <br>
-                        <label for="'.self::$passRepeat.'">Repeat password  :</label>
-                        <input type="password" size="20" name="'.self::$passRepeat.'" id="'.self::$passRepeat.'" value="">
+                        <input type="password" class="input-field" placeholder="Repeat Password" size="20" name="'.self::$passRepeat.'" id="'.self::$passRepeat.'" value="">
                         <br>
                         <input id="submit" type="submit" name="'.self::$register.'" value="Register">
                         <br>
-                    </fieldset>
-                </form>';
+                </form>
+                </div>';
     }
 
     public function response() {

@@ -13,6 +13,7 @@ require_once("view/DateTimeView.php");
 require_once("view/LayoutView.php");
 require_once("view/RegistrationView.php");
 require_once("view/EntryView.php");
+require_once("view/ViewEntryView.php");
 
 if (Settings::DISPLAY_ERRORS) {
     error_reporting(-1);
@@ -26,12 +27,13 @@ session_start();
 $ed = new EntryDAL();
 $m = new LoginModel();
 $e = new Entries($ed);
+$vev = new ViewEntryView();
 $v = new LoginView($m, $e);
 $rv = new RegistrationView();
 $ev = new EditView();
 $rc = new RegisterController($rv, $v);
 $ec = new EntryController($ev, $v);
-$lc = new LoginController($m, $v, $ev, $ec);
+$lc = new LoginController($m, $v, $vev);
 $ac = new ApplicationController($lc, $rc, $ec);
 
 //Controller must be run first since state is changed
@@ -41,5 +43,5 @@ $ac->doControl();
 //Generate output
 $dtv = new DateTimeView();
 $lv = new LayoutView();
-$lv->render($m->isLoggedIn($v->getUserClient()), $v, $dtv, $rv, $ev);
+$lv->render($m->isLoggedIn($v->getUserClient()), $v, $dtv, $rv, $ev, $vev);
 

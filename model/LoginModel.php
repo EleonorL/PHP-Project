@@ -113,5 +113,10 @@ class LoginModel {
         $text = $this->entryDAL->load($name, $ID);
         return $text;
     }
+
+	public function redirectViewEntry($entryID) {
+        header("Location: $entryID");
+
+	}
 	
 }

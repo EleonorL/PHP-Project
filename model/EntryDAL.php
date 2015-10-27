@@ -26,14 +26,19 @@ class EntryDAL {
         return Settings::ENTRYPATH . addslashes($name) . "/" .$ID;
     }
 
+    /**
+     * Creates and returns an array of the current users entries
+     */
     public function getEntries() {
-        $name = $_SESSION['username'];
+        $name = "";
+        if(isset($_SESSION['username']))
+            $name = $_SESSION['username'];
         $ID = "";
         $entries = "";
         if(file_exists(Settings::ENTRYPATH . addslashes($name) . "/index"))
             $ID = file_get_contents(Settings::ENTRYPATH . addslashes($name) . "/index") - 1;
         while($ID != 0) {
-            $entry = $this->load($name, $ID);
+            $entry = new Entry($name, $this->load($name, $ID), $ID);
             $entries[] = $entry;
             $ID = $ID - 1;
         }

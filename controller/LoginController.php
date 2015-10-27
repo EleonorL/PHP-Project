@@ -11,27 +11,32 @@ class LoginController {
 
 	private $model;
 	private $loginView;
-    private $entryView;
-	private $entryController;
+    private $viewEntryView;
 
-	public function __construct(LoginModel $model, LoginView $loginView, EditView $entryView, EntryController $entryController ) {
+	public function __construct(LoginModel $model, LoginView $loginView, ViewEntryView $viewEntryView) {
 		$this->model = $model;
 		$this->loginView =  $loginView;
-        $this->entryView = $entryView;
-		$this->entryController = $entryController;
+        $this->viewEntryView = $viewEntryView;
 	}
 
 	public function doLoginControl() {
 		
 		$userClient = $this->loginView->getUserClient();
 		if ($this->model->isLoggedIn($userClient)) {
+
+			if($this->loginView->userWantsToView()) {
+                $entry = $this->loginView->getMenuURL();
+                $this->viewEntryView->setCurrentEntry($entry);
+                $this->loginView->setClickedItem();
+			}
+
 			if ($this->loginView->userWantsToLogout()) {
 				$this->model->doLogout();
 				$this->loginView->setUserLogout();
 			}
 		}
 		else {
-			if ($this->loginView->userWantsToLogin()) {
+			if ($this->loginView->userWantsToLogin() && $this->loginView->checkForm()) {
 				$uc = $this->loginView->getCredentials();
 				if ($this->model->doLogin($uc) == true) {
                     $name = $uc->getName();
